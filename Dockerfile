@@ -31,4 +31,4 @@ RUN mkdir -p static/uploads
 EXPOSE 5000
 
 # 启动命令
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["python", "app.py"]
