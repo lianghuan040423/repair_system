@@ -19,4 +19,4 @@ RUN mkdir -p static/uploads
 EXPOSE 5000
 
 # 直接用 Python 启动，避免 gunicorn 找不到的问题
-CMD ["python", "app.py"]
+CMD ["gunicorn", "app:app"]
