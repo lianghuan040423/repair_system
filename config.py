@@ -1,4 +1,5 @@
 import os
+<<<<<<< HEAD
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -22,6 +23,14 @@ if not SQLALCHEMY_DATABASE_URI:
     raise ValueError("错误：未找到 DATABASE_URL 环境变量，请在 .env 文件中配置！")
 
 # ===== 以下内容保持不变 =====
+=======
+
+# ===== 关键：变量名必须是 SQLALCHEMY_DATABASE_URI（与 app.py 一致） =====
+SQLALCHEMY_DATABASE_URI = os.environ.get(
+    'DATABASE_URL',
+    'mysql+pymysql://root:530121@10.0.0.17:3306/repair_system?charset=utf8mb4'
+)
+>>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 JSON_AS_ASCII = False
 
