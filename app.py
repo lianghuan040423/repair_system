@@ -12,11 +12,7 @@ from datetime import datetime, timedelta
 import bcrypt
 
 # 关键：从models统一导入db和所有数据模型
-<<<<<<< HEAD
 from models import db, Room, Building, User, RepairOrder, Notice, SmsCode, DutySchedule
-=======
-from models import db, Room, Building, RepairType, User, RepairOrder, Notice, SmsCode, DutySchedule
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # Flask实例初始化
 app = Flask(__name__)
@@ -165,11 +161,7 @@ def user_register():
         db.session.remove()
         traceback.print_exc()
         print(f"【全局异常日志】注册接口运行异常，错误详情: {str(e)}")
-<<<<<<< HEAD
         return jsonify({'code': 500, 'msg': '服务器繁忙，请稍后再试', 'data': None}), 500
-=======
-        return jsonify({'code': 500, 'msg': f'服务器错误: {str(e)}', 'data': None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # ===================== 登录接口 =====================
 @app.route('/api/user/login', methods=['POST'])
@@ -364,11 +356,7 @@ def add_repair_order():
         db.session.rollback()
         db.session.remove()
         traceback.print_exc()
-<<<<<<< HEAD
         return jsonify({"code":500,"msg":"服务器繁忙,请稍后重试","data":None}),500
-=======
-        return jsonify({"code":500,"msg":f"提交报修失败：{str(e)}","data":None}),500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # ===================== 住户查询本人报修工单列表（带物业人员信息） =====================
 @app.route('/api/repair/my_list', methods=['POST'])
@@ -459,15 +447,11 @@ def get_all_repair_list():
         # 判断当前物业人员是否值班（决定能否操作）
         can_modify = False
         today = datetime.now().date()
-<<<<<<< HEAD
         duty = DutySchedule.query.filter(
             DutySchedule.worker_id == user.id,
             DutySchedule.start_date <= today,
             DutySchedule.end_date >= today
         ).first()
-=======
-        duty = DutySchedule.query.filter_by(worker_id=user.id, duty_date=today).first()
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
         if duty:
             can_modify = True
 
@@ -546,15 +530,11 @@ def update_repair_status():
             return jsonify({"code": 403, "msg": "无操作权限", "data": None}), 403
 
         today = datetime.now().date()
-<<<<<<< HEAD
         duty = DutySchedule.query.filter(
             DutySchedule.worker_id == worker.id,
             DutySchedule.start_date <= today,
             DutySchedule.end_date >= today
         ).first()
-=======
-        duty = DutySchedule.query.filter_by(worker_id=worker.id, duty_date=today).first()
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
         if not duty:
             return jsonify({"code": 403, "msg": "您今天未值班，无法修改工单状态", "data": None}), 403
 
@@ -891,18 +871,13 @@ def get_duty_list():
         if not admin or admin.role != "admin":
             return jsonify({"code": 403, "msg": "无权限", "data": None}), 403
 
-<<<<<<< HEAD
         duties = DutySchedule.query.order_by(DutySchedule.start_date.desc()).all()
-=======
-        duties = DutySchedule.query.order_by(DutySchedule.duty_date.desc()).all()
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
         result = []
         for d in duties:
             worker = User.query.get(d.worker_id)
             result.append({
                 "id": d.id,
                 "worker_id": d.worker_id,
-<<<<<<< HEAD
                 "worker_name": worker.name if worker else "",
                 "worker_phone": worker.phone if worker else "",
                 "start_date": d.start_date.strftime("%Y-%m-%d") if d.start_date else "",
@@ -912,15 +887,6 @@ def get_duty_list():
     except Exception as e:
         traceback.print_exc()  # 关键：打印错误堆栈
         return jsonify({"code": 500, "msg": '服务器繁忙，请稍后重试', "data": None}), 500
-=======
-                "worker_name": worker.name if worker else "",  # 改为 name
-                "worker_phone": worker.phone if worker else "",
-                "duty_date": d.duty_date.strftime("%Y-%m-%d")
-            })
-        return jsonify({"code": 200, "msg": "查询成功", "data": result}), 200
-    except Exception as e:
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/duty/add', methods=['POST'])
 @api_cost_log
@@ -929,12 +895,8 @@ def add_duty():
         data = request.get_json()
         admin_phone = data.get("admin_phone")
         worker_id = data.get("worker_id")
-<<<<<<< HEAD
         start_date = data.get("start_date")
         end_date = data.get("end_date")
-=======
-        duty_date = data.get("duty_date")
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
         admin = User.query.filter_by(phone=admin_phone).first()
         if not admin or admin.role != "admin":
@@ -944,7 +906,6 @@ def add_duty():
         if not worker or worker.role != "worker":
             return jsonify({"code": 400, "msg": "物业人员不存在", "data": None}), 400
 
-<<<<<<< HEAD
         try:
             start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
             end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
@@ -985,25 +946,6 @@ def add_duty():
         db.session.rollback()
         traceback.print_exc()  # 关键：打印错误堆栈
         return jsonify({"code": 500, "msg":'服务器繁忙，请稍后重试', "data": None}), 500
-=======
-        if duty_date:
-            duty_date_obj = datetime.strptime(duty_date, "%Y-%m-%d").date()
-        else:
-            duty_date_obj = datetime.now().date()
-
-        existing = DutySchedule.query.filter_by(worker_id=worker_id, duty_date=duty_date_obj).first()
-        if existing:
-            return jsonify({"code": 400, "msg": "该人员当天已排班", "data": None}), 400
-
-        new_duty = DutySchedule(worker_id=worker_id, duty_date=duty_date_obj)
-        db.session.add(new_duty)
-        db.session.commit()
-
-        return jsonify({"code": 200, "msg": "添加值班成功", "data": {"id": new_duty.id}}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/duty/remove', methods=['POST'])
 @api_cost_log
@@ -1026,11 +968,7 @@ def remove_duty():
         return jsonify({"code": 200, "msg": "取消值班成功", "data": None}), 200
     except Exception as e:
         db.session.rollback()
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg": '服务器繁忙，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/workers', methods=['POST'])
 @api_cost_log
@@ -1053,11 +991,7 @@ def get_all_workers():
             })
         return jsonify({"code": 200, "msg": "查询成功", "data": result}), 200
     except Exception as e:
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # ===================== 公告接口 =====================
 @app.route('/api/notice/latest', methods=['GET'])
@@ -1082,11 +1016,7 @@ def get_latest_notice():
             }
         }), 200
     except Exception as e:
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/notice/list', methods=['POST'])
 @api_cost_log
@@ -1102,11 +1032,7 @@ def get_notice_list():
             })
         return jsonify({"code": 200, "msg": "查询成功", "data": result}), 200
     except Exception as e:
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/notice/detail', methods=['POST'])
 @api_cost_log
@@ -1133,11 +1059,7 @@ def get_notice_detail():
             }
         }), 200
     except Exception as e:
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # ===================== 公告管理接口（管理员） =====================
 @app.route('/api/admin/notice/add', methods=['POST'])
@@ -1173,11 +1095,7 @@ def admin_add_notice():
         }), 200
     except Exception as e:
         db.session.rollback()
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/notice/edit', methods=['POST'])
 @api_cost_log
@@ -1207,11 +1125,7 @@ def admin_edit_notice():
         return jsonify({"code": 200, "msg": "公告更新成功", "data": None}), 200
     except Exception as e:
         db.session.rollback()
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/notice/delete', methods=['POST'])
 @api_cost_log
@@ -1234,11 +1148,7 @@ def admin_delete_notice():
         return jsonify({"code": 200, "msg": "公告删除成功", "data": None}), 200
     except Exception as e:
         db.session.rollback()
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # ===================== 管理员管理接口 =====================
 @app.route('/api/admin/add_admin', methods=['POST'])
@@ -1281,11 +1191,7 @@ def add_admin():
         }), 200
     except Exception as e:
         db.session.rollback()
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/list', methods=['POST'])
 @api_cost_log
@@ -1309,11 +1215,7 @@ def admin_list():
             })
         return jsonify({"code": 200, "msg": "查询成功", "data": result}), 200
     except Exception as e:
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 @app.route('/api/admin/delete_admin', methods=['POST'])
 @api_cost_log
@@ -1342,11 +1244,7 @@ def delete_admin():
         return jsonify({"code": 200, "msg": "删除成功", "data": None}), 200
     except Exception as e:
         db.session.rollback()
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
 
 # ===================== 管理员获取总工单数 =====================
 @app.route('/api/admin/total_orders', methods=['POST'])
@@ -1368,15 +1266,7 @@ def admin_total_orders():
             "data": {"total": total}
         }), 200
     except Exception as e:
-<<<<<<< HEAD
         return jsonify({"code": 500, "msg" : '服务器繁，请稍后重试', "data": None}), 500
 # 程序入口
 if __name__ == '__main__':
-=======
-        return jsonify({"code": 500, "msg": str(e), "data": None}), 500
-# 程序入口
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
->>>>>>> 5e036f6a408ae0904899abe4af4904da810d9e9e
     app.run(host='0.0.0.0', port=5000, debug=False)
