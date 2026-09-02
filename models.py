@@ -128,8 +128,5 @@ class DutySchedule(db.Model):
     end_date: Mapped[datetime] = db.Column(db.Date, nullable=True, comment='值班结束日期')
     create_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now)
 
-    __table_args__ = (
-        db.UniqueConstraint('worker_id', 'duty_date', name='uq_worker_duty_date'),
-    )
     # 去掉原来的 UniqueConstraint，因为我们要允许同一个员工有多个时间段
     # 重叠校验会在代码逻辑里做
