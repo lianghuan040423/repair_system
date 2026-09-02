@@ -1,6 +1,6 @@
 # models.py
 from datetime import datetime
-from sqlalchemy.dialects.mssql import TINYINT
+from sqlalchemy import Integer
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, relationship
 from sqlalchemy import MetaData, String, ForeignKey, DateTime
@@ -91,7 +91,7 @@ class RepairOrder(db.Model):
     title: Mapped[str] = db.Column(db.String(50), nullable=False, comment='报修标题')
     content: Mapped[str] = db.Column(db.Text, comment='报修描述')
     img_url: Mapped[str] = db.Column(db.String(255), comment='上传图片路径')
-    status: Mapped[TINYINT] = db.Column(TINYINT, nullable=False, comment='工单状态 0：待维修 1：维修中 2：已完成')
+    status: Mapped[Integer] = db.Column(Integer, nullable=False, comment='工单状态 0：待维修 1：维修中 2：已完成')
     building: Mapped[str] = db.Column(db.String(20), nullable=False, comment='保修楼栋（方便物业）')
     room: Mapped[str] = db.Column(db.String(20), nullable=False, comment='报修房号（便于物业筛选）')
     submit_time: Mapped[datetime] = db.Column(db.DateTime, nullable=False, comment='工单提交时间')

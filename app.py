@@ -109,9 +109,10 @@ def user_register():
             room_id = room.id
         # 核心改动：使用原子INSERT IGNORE单条SQL插入用户
         insert_sql = text("""
-                          INSERT IGNORE INTO `user` 
+                          INSERT INTO "user" 
             (phone, password, name, room_id, building_no, room_no, role, user_status, audit_id, create_time)
             VALUES (:phone, :pwd, :name, :rid, :bno, :rno, :role, '正常', :audit, NOW())
+            ON CONFLICT (phone) DO NOTHING
                           """)
         result = db.session.execute(
             insert_sql,
@@ -734,7 +735,7 @@ def reset_password():
 import os
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = 'static/uploads'
+UPLOAD_FOLDER = '/var/www/repair_static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'mp4', 'mov', 'avi'}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -763,7 +764,7 @@ def upload_file():
         file_path = os.path.join(UPLOAD_FOLDER, unique_name)
         file.save(file_path)
 
-        file_url = f"http://{request.host}/static/uploads/{unique_name}"
+        file_url = f"http://{request.host}/static/{unique_name}"
 
         return jsonify({
             "code": 200,
