@@ -41,19 +41,7 @@ class Building(db.Model):
     id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False, comment='楼栋id')
     building_no: Mapped[str] = db.Column(db.String(20), nullable=False, comment='楼栋号')
     create_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now, comment='创建时间')
-    update_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now,
-                                              comment='更新时间')
-
-
-# 报修类型表
-class RepairType(db.Model):
-    __tablename__ = 'repair_type'
-    id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False, comment='类型id')
-    type_name: Mapped[str] = db.Column(db.String(50), nullable=False, unique=True, comment='报修类型名称')
-    sort: Mapped[int] = db.Column(db.Integer, default=0, comment='排序值')
-    create_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now, comment='创建时间')
-    update_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now,
-                                              comment='更新时间')
+    update_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now,comment='更新时间')
 
 
 # 用户模型
@@ -129,14 +117,19 @@ class SmsCode(db.Model):
     expire_time: Mapped[datetime] = db.Column(db.DateTime, nullable=False, comment='过期时间')
     used: Mapped[int] = db.Column(db.Integer, default=0, comment='0-未使用 1-已使用')
 
-# ===================== 值班表 =====================
+
+# ===================== 值班表（支持时间段） =====================
 class DutySchedule(db.Model):
     __tablename__ = 'duty_schedule'
     id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True)
     worker_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    duty_date: Mapped[datetime] = db.Column(db.Date, nullable=False)
+
+    start_date: Mapped[datetime] = db.Column(db.Date, nullable=True, comment='值班开始日期')
+    end_date: Mapped[datetime] = db.Column(db.Date, nullable=True, comment='值班结束日期')
     create_time: Mapped[datetime] = db.Column(db.DateTime, default=datetime.now)
 
     __table_args__ = (
         db.UniqueConstraint('worker_id', 'duty_date', name='uq_worker_duty_date'),
     )
+    # 去掉原来的 UniqueConstraint，因为我们要允许同一个员工有多个时间段
+    # 重叠校验会在代码逻辑里做
